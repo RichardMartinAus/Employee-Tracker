@@ -80,6 +80,26 @@ function viewAllEmployees() {
       console.table(results);
     }
   );
+
+  mainMenu();
+}
+
+function viewAllRoles() {
+  db.query(
+    'SELECT RO.id AS id, RO.title AS title, DE.name AS department, RO.salary AS salary FROM role RO JOIN department DE ON RO.department_id = DE.id;',
+    function (err, results) {
+      console.table(results);
+    }
+  );
+
+  mainMenu();
+}
+
+function viewAllDepartments() {
+  db.query('SELECT * FROM department;', function (err, results) {
+    console.table(results);
+  });
+
   mainMenu();
 }
 
