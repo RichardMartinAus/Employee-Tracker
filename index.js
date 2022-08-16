@@ -1,71 +1,56 @@
-const express = require('express');
-const inquirer = require('inquirer');
-const cTable = require('console.table');
+// Import and require cTable and inquirer
+const inquirer = require("inquirer");
+const cTable = require("console.table");
 // Import and require mysql2
-const mysql = require('mysql2');
-
-// const PORT = process.env.PORT || 3001;
-const app = express();
-
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const mysql = require("mysql2");
 
 // Connect to database
 const db = mysql.createConnection(
   {
-    host: 'localhost',
+    host: "localhost",
     // MySQL username,
-    user: 'root',
+    user: "root",
     // MySQL password
-    password: 'P4ssword!',
-    database: 'company_db',
+    password: "P4ssword!",
+    database: "company_db",
   },
   console.log(`Connected to the company_db database.`)
 );
 
-// Default response for any other request (Not Found)
-app.use((req, res) => {
-  res.status(404).end();
-});
-
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
-
+// function for main menu
 function mainMenu() {
   inquirer
     .prompt([
       {
-        type: 'list',
-        name: 'action',
-        message: 'What would you like to do?',
+        type: "list",
+        name: "action",
+        message: "What would you like to do?",
         choices: [
-          'View all employees',
-          'Add and employee',
-          'Update an employee role',
-          'View all roles',
-          'Add a role',
-          'View all departments',
-          'Add a department',
-          'Quit',
+          "View all employees",
+          "Add and employee",
+          "Update an employee role",
+          "View all roles",
+          "Add a role",
+          "View all departments",
+          "Add a department",
+          "Quit",
         ],
       },
     ])
     .then((answers) => {
-      if (answers.action == 'View all employees') {
+      if (answers.action == "View all employees") {
         viewAllEmployees();
-      } else if (answers.action == 'Add and employee') {
+      } else if (answers.action == "Add and employee") {
         addEmployee();
-      } else if (answers.action == 'Update an employee role') {
+      } else if (answers.action == "Update an employee role") {
         updateEmployee();
-      } else if (answers.action == 'View all roles') {
+      } else if (answers.action == "View all roles") {
         viewAllRoles();
-      } else if (answers.action == 'Add a role') {
+      } else if (answers.action == "Add a role") {
         addRole();
-      } else if (answers.action == 'View all departments') {
+      } else if (answers.action == "View all departments") {
         viewAllDepartments();
-      } else if (answers.action == 'Add a department') {
+      } else if (answers.action == "Add a department") {
         addDepartment();
       } else {
         quit();
@@ -73,6 +58,7 @@ function mainMenu() {
     });
 }
 
+// function to view all the emplyees in the DB
 const viewAllEmployees = () =>
   new Promise((resolve, reject) => {
     db.query(
@@ -87,97 +73,96 @@ const viewAllEmployees = () =>
     );
   });
 
+// funtion to add a new employee
 function addEmployee() {
   inquirer
     .prompt([
       {
-        type: 'input',
-        name: 'emp_fname',
-        message: 'What is the employees first name?',
+        type: "input",
+        name: "emp_fname",
+        message: "What is the employees first name?",
       },
       {
-        type: 'input',
-        name: 'emp_lname',
-        message: 'What is the employees last name?',
+        type: "input",
+        name: "emp_lname",
+        message: "What is the employees last name?",
       },
       {
-        type: 'list',
-        name: 'emp_role',
-        message: 'What is the employees roll?',
+        type: "input",
+        name: "emp_role",
+        message: "What is the employees role ID?",
+      },
+      {
+        type: "list",
+        name: "emp_manager",
+        message: "Who is the employees manager? (Enter Null if no manager)",
         choices: [
-          'Sales Lead',
-          'Salesperson',
-          'Lead Engineer',
-          'Software Engineer',
-          'Account Manager',
-          'Accountant',
-          'Legal Team Lead',
-          'Lawyer',
-        ],
-      },
-      {
-        type: 'list',
-        name: 'emp_manager',
-        message: 'Who is the employees manager? (Enter Null if no manager)',
-        choices: [
-          'John Doe',
-          'Ashley Rodriguez',
-          'Kunal Singh',
-          'Sarah Lourd',
-          'Null',
+          "John Doe",
+          "Ashley Rodriguez",
+          "Kunal Singh",
+          "Sarah Lourd",
+          "Null",
         ],
       },
     ])
     .then((answers) => {
-      let roleId = function (answers) {
-        if (answers.emp_role === 'Sales Lead') {
+      let managerId = function () {
+        if (answers.emp_manager === "John Doe") {
           return 1;
-        } else if (answers.emp_role === 'Salesperson') {
-          return 2;
-        } else if (answers.emp_role === 'Lead Engineer') {
+        } else if (answers.emp_manager === "Ashley Rodriguez") {
           return 3;
-        } else if (answers.emp_role === 'Software Engineer') {
-          return 4;
-        } else if (answers.emp_role === 'Account Manager') {
+        } else if (answers.emp_manager === "Kunal Singh") {
           return 5;
-        } else if (answers.emp_role === 'Accountant') {
-          return 6;
-        } else if (answers.emp_role === 'Legal Team Lead') {
+        } else if (answers.emp_manager === "Sarah Lourd") {
           return 7;
-        } else if (answers.emp_role === 'Lawyer') {
-          return 8;
+        } else if (answers.emp_manager === "Null") {
+          return "Null";
         }
-        console.log(roleId);
-      };
-
-      let managerId = function (answers) {
-        if (answers.emp_manager === 'John Doe') {
-          return 1;
-        } else if (answers.emp_manager === 'Ashley Rodriguez') {
-          return 3;
-        } else if (answers.emp_manager === 'Kunal Singh') {
-          return 5;
-        } else if (answers.emp_manager === 'Sarah Lourd') {
-          return 7;
-        } else if (answers.emp_manager === 'Null') {
-          return 'Null';
-        }
-        console.log(managerId);
       };
 
       db.query(
-        `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answers.emp_fname}", "${answers.emp_lname}", ${roleId}, ${managerId});`,
+        `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${
+          answers.emp_fname
+        }", "${answers.emp_lname}", ${answers.emp_role}, ${managerId(
+          answers.emp_manager
+        )});`,
         function (err, results) {
-          console.log('New employee added'), mainMenu();
+          console.log(`\nNew employee added\n`), mainMenu();
         }
       );
     });
 }
 
+// function to update an employees role
+function updateEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "allEmp",
+        message: "Who would you like to update? (Enter the EmployeeID)",
+      },
+      {
+        type: "input",
+        name: "newRole",
+        message: "What is their new role ID?",
+      },
+    ])
+    .then((answers) => {
+      db.query(
+        `UPDATE employee SET role_id = ${answers.newRole} WHERE id = ${answers.allEmp};`,
+        function (err, results) {
+          console.log(`\nEmployee updated!\n`), mainMenu();
+        }
+      );
+    });
+}
+
+// function to view all roles
 const viewAllRoles = () =>
   new Promise((resolve, reject) => {
     db.query(
-      'SELECT RO.id AS id, RO.title AS title, DE.name AS department, RO.salary AS salary FROM role RO JOIN department DE ON RO.department_id = DE.id;',
+      "SELECT RO.id AS id, RO.title AS title, DE.name AS department, RO.salary AS salary FROM role RO JOIN department DE ON RO.department_id = DE.id;",
       function (err, results) {
         if (err) {
           reject(err);
@@ -188,38 +173,40 @@ const viewAllRoles = () =>
     );
   });
 
+// function to add a new role
 function addRole() {
   inquirer
     .prompt([
       {
-        type: 'input',
-        name: 'roleName',
-        message: 'What is the name of the role?',
+        type: "input",
+        name: "roleName",
+        message: "What is the name of the role?",
       },
       {
-        type: 'input',
-        name: 'salary',
-        message: 'What is the salary of the role?',
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the role?",
       },
       {
-        type: 'input',
-        name: 'deptId',
-        message: 'What is the departments ID? (1 - 5)',
+        type: "input",
+        name: "dept",
+        message: "What departmentID does the role fall under?",
       },
     ])
     .then((answers) => {
       db.query(
-        `INSERT INTO role (title, salary, department_id) VALUES ("${answers.roleName}", ${answers.salary}, ${answers.deptId});`,
+        `INSERT INTO role (title, salary, department_id) VALUES ("${answers.roleName}", ${answers.salary}, ${answers.dept});`,
         function (err, results) {
-          console.log('New department added'), mainMenu();
+          console.log(`\nNew role added\n`), mainMenu();
         }
       );
     });
 }
 
+// function to view all departments
 const viewAllDepartments = () =>
   new Promise((resolve, reject) => {
-    db.query('SELECT * FROM department;', function (err, results) {
+    db.query("SELECT * FROM department;", function (err, results) {
       if (err) {
         reject(err);
       } else {
@@ -228,32 +215,36 @@ const viewAllDepartments = () =>
     });
   });
 
+// function to add a new department
 function addDepartment() {
   inquirer
     .prompt([
       {
-        type: 'input',
-        name: 'deptName',
-        message: 'What is the name of the department?',
+        type: "input",
+        name: "deptName",
+        message: "What is the name of the department?",
       },
     ])
     .then((answers) => {
       db.query(
         `INSERT INTO department (name) VALUES ("${answers.deptName}");`,
         function (err, results) {
-          console.log('New department added'), mainMenu();
+          console.log(`\nNew department added\n`), mainMenu();
         }
       );
     });
 }
 
+// init function to run welcome message and start main menu
 function init() {
-  console.log('WELCOME TO THE COMPANY EMPLOYEE TRACKER');
+  console.log(`\n\nWELCOME TO THE COMPANY EMPLOYEE TRACKER\n\n`);
   mainMenu();
 }
 
+// exit funciton
 function quit() {
   process.exit(1);
 }
 
+// function to fire when program is
 init();
