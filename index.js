@@ -27,7 +27,7 @@ function mainMenu() {
         message: "What would you like to do?",
         choices: [
           "View all employees",
-          "Add and employee",
+          "Add an employee",
           "Update an employee role",
           "View all roles",
           "Add a role",
@@ -40,7 +40,7 @@ function mainMenu() {
     .then((answers) => {
       if (answers.action == "View all employees") {
         viewAllEmployees();
-      } else if (answers.action == "Add and employee") {
+      } else if (answers.action == "Add an employee") {
         addEmployee();
       } else if (answers.action == "Update an employee role") {
         updateEmployee();
